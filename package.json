@@ -29,6 +29,7 @@
     "qs": "^6.14.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
+    "uuid": "^11.1.0",
     "ws": "^8.18.0",
     "y-websocket": "^2.1.0"
   },
@@ -41,6 +42,7 @@
     "@types/node": "^20.3.1",
     "@types/qs": "^6.9.18",
     "@types/supertest": "^6.0.0",
+    "@types/uuid": "^10.0.0",
     "@types/ws": "^8.5.14",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",

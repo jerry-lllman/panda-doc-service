@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SlateDocModule } from './modules/slate-doc/slate-doc.module';
+import { DocumentCollaborationModule } from './modules/document-collaboration/document-collaboration.module';
 
 @Module({
-  imports: [SlateDocModule],
+  imports: [DocumentCollaborationModule],
   controllers: [AppController],
   providers: [AppService],
 })

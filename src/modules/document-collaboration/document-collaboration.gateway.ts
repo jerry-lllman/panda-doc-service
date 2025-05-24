@@ -1,4 +1,4 @@
-import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, ConnectedSocket, MessageBody, SubscribeMessage } from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, WebSocket } from 'ws';
 // @ts-expect-error @ts-ignore
 import * as utils from 'y-websocket/bin/utils';
@@ -9,7 +9,7 @@ import { IncomingMessage } from 'http';
 @WebSocketGateway(4000, {
   path: '/doc-room'
 })
-export class SlateDocGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class DocumentCollaborationGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -25,7 +25,7 @@ export class SlateDocGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     setupWSConnection(client, request, { docName: docId })
   }
 
-  handleDisconnect(@ConnectedSocket() client: WebSocket) {
-    console.log('Client disconnected', client);
+  handleDisconnect(@ConnectedSocket() _client: WebSocket) {
+    console.log('Client disconnected');
   }
-}
+} 

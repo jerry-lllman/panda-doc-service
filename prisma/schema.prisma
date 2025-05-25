@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  documents Document[] @relation("OwnedDocuments")
+  access    DocAccess[]
+}
+
+model Document {
+  id             String       @id @default(uuid())
+  title          String
+  description    String?
+  ownerId        String
+  owner          User         @relation("OwnedDocuments", fields: [ownerId], references: [id])
+  documentType   DocumentType @default(RICH_TEXT)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  content        DocumentContent?
+  collaborators  DocAccess[]
+  isPublic       Boolean      @default(false)
+  version        Int          @default(1)
+  lastEditedAt   DateTime     @default(now())
+}
+
+model DocumentContent {
+  id         String   @id @default(uuid())
+  documentId String   @unique
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  content    Json     // Stores the Tiptap JSON content
+  rawContent String?  // Optional raw text content for search
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+}
+
+model DocAccess {
+  id         String     @id @default(uuid())
+  documentId String
+  document   Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  accessType AccessType @default(VIEWER)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@unique([documentId, userId])
+}
+
+enum DocumentType {
+  RICH_TEXT
+  CODE
+  SPREADSHEET
+}
+
+enum AccessType {
+  VIEWER
+  EDITOR
+  COMMENTER
+}

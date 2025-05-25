@@ -3,9 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DocumentCollaborationModule } from './modules/document-collaboration/document-collaboration.module';
 import { DocumentModule } from './modules/document/document.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [DocumentCollaborationModule, DocumentModule],
+  imports: [PrismaModule, DocumentCollaborationModule, DocumentModule],
   controllers: [AppController],
   providers: [AppService],
 })

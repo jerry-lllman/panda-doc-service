@@ -14,6 +14,7 @@ export class DocumentService {
     const document = await this.prisma.document.create({
       data: {
         title: createDocumentDto.title,
+        icon: createDocumentDto.icon,
         ownerId: user.id,
         content: {
           create: {
@@ -33,6 +34,7 @@ export class DocumentService {
       id: document.id,
       title: document.title,
       content: document.content?.rawContent || '',
+      icon: document.icon,
       createdBy: document.owner.name || document.owner.email,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
@@ -51,6 +53,7 @@ export class DocumentService {
       id: doc.id,
       title: doc.title,
       content: doc.content?.rawContent || '',
+      icon: doc.icon,
       createdBy: doc.owner.name || doc.owner.email,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -72,6 +75,7 @@ export class DocumentService {
       id: document.id,
       title: document.title,
       content: document.content?.rawContent || '',
+      icon: document.icon,
       createdBy: document.owner.name || document.owner.email,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,

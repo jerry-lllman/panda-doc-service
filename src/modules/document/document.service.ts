@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDocumentDto } from './dto/create-document.dto';
+import { UpdateDocumentDto } from './dto/update-document.dto';
 import { Document } from './entities/document.entity';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -69,7 +70,10 @@ export class DocumentService {
       },
     });
 
-    if (!document) return undefined;
+    if (!document) {
+      // TODO: Common interface for error handling
+      return undefined;
+    };
 
     return {
       id: document.id,
@@ -79,6 +83,55 @@ export class DocumentService {
       createdBy: document.owner.name || document.owner.email,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
+    };
+  }
+
+  async update(id: string, updateDocumentDto: UpdateDocumentDto): Promise<Document> {
+    // Check if document exists
+    const existingDocument = await this.prisma.document.findUnique({
+      where: { id },
+      include: { content: true }
+    });
+
+    if (!existingDocument) {
+      throw new NotFoundException(`Document with id ${id} not found`);
+    }
+
+    // 提取基本字段和内容字段
+    const { content, ...documentFields } = updateDocumentDto;
+
+    // 构建更新数据，只包含提供的字段
+    const updateData = {
+      ...documentFields,
+      // 只有当内容被提供时才更新内容
+      ...(content !== undefined && {
+        content: {
+          update: {
+            content: JSON.parse(content),
+            rawContent: content,
+          }
+        }
+      })
+    };
+
+    // Update the document with only the provided fields
+    const updatedDocument = await this.prisma.document.update({
+      where: { id },
+      data: updateData,
+      include: {
+        content: true,
+        owner: true,
+      },
+    });
+
+    return {
+      id: updatedDocument.id,
+      title: updatedDocument.title,
+      content: updatedDocument.content?.rawContent || '',
+      icon: updatedDocument.icon,
+      createdBy: updatedDocument.owner.name || updatedDocument.owner.email,
+      createdAt: updatedDocument.createdAt,
+      updatedAt: updatedDocument.updatedAt,
     };
   }
 

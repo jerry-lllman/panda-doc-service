@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { Document } from './entities/document.entity';
 import { PrismaService } from '../../prisma/prisma.service';
+import { BusinessException } from '@/common/exceptions/business.exception';
+import { ErrorEnum } from '@/constants/error-code.constant';
 
 @Injectable()
 export class DocumentService {
@@ -71,8 +73,7 @@ export class DocumentService {
     });
 
     if (!document) {
-      // TODO: Common interface for error handling
-      return undefined;
+      throw new BusinessException(ErrorEnum.DOCUMENT_DOES_NOT_EXIST);
     };
 
     return {
@@ -94,7 +95,7 @@ export class DocumentService {
     });
 
     if (!existingDocument) {
-      throw new NotFoundException(`Document with id ${id} not found`);
+      throw new BusinessException(ErrorEnum.DOCUMENT_DOES_NOT_EXIST);
     }
 
     // 提取基本字段和内容字段

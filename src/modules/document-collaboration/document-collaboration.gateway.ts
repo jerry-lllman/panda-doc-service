@@ -1,9 +1,8 @@
 import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, WebSocket } from 'ws';
-// @ts-expect-error @ts-ignore
 import * as utils from 'y-websocket/bin/utils';
 const { setupWSConnection } = utils
-import * as qs from 'qs'
+import qs from 'qs'
 import { IncomingMessage } from 'http';
 
 @WebSocketGateway(4000, {

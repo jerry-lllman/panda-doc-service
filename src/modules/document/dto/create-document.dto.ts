@@ -23,8 +23,7 @@ export class CreateDocumentDto {
     example: 'This is the content of the document',
   })
   @IsString()
-  @IsNotEmpty()
-  content: string;
+  content: string = '';
 
   @ApiProperty({
     description: 'The created by of the document',

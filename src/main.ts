@@ -3,6 +3,7 @@ import { HttpStatus, Logger, UnprocessableEntityException, ValidationPipe } from
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { NestFastifyApplication } from '@nestjs/platform-fastify'
+import { WsAdapter } from '@nestjs/platform-ws'
 
 import { useContainer } from 'class-validator'
 
@@ -29,6 +30,9 @@ async function bootstrap() {
 
   const { port, globalPrefix } = configService.get('app', { infer: true })
   app.setGlobalPrefix(globalPrefix)
+
+  // Configure WebSocket adapter for Fastify
+  app.useWebSocketAdapter(new WsAdapter(app))
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
 

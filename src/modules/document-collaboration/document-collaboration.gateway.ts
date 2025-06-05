@@ -4,27 +4,59 @@ import * as utils from 'y-websocket/bin/utils';
 const { setupWSConnection } = utils
 import qs from 'qs'
 import { IncomingMessage } from 'http';
+import { Logger } from '@nestjs/common';
 
-@WebSocketGateway(4000, {
-  path: '/doc-room'
+@WebSocketGateway({
+  path: '/doc-room',
+  transports: ['websocket'],
+  cors: {
+    origin: '*',
+    credentials: true
+  }
 })
 export class DocumentCollaborationGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  logger = new Logger('DocumentCollaborationGateway')
+
   afterInit() {
-    console.log('Server initialized');
+    this.logger.debug('WebSocket Server initialized, path: /doc-room');
   }
 
   handleConnection(@ConnectedSocket() client: WebSocket, @MessageBody() request: IncomingMessage) {
-    console.log('Client connected')
-    // '/doc-room?docId=123'
-    const { docId } = qs.parse(request.url.split('?')[1])
+    this.logger.debug('Client connected');
 
-    setupWSConnection(client, request, { docName: docId })
+    try {
+      // '/doc-room?docId=123'
+      const url = request.url || '';
+      const queryString = url.split('?')[1];
+
+      if (!queryString) {
+        this.logger.warn('No query string found in WebSocket connection URL');
+        client.close(1008, 'Missing docId parameter');
+        return;
+      }
+
+      const { docId } = qs.parse(queryString);
+
+      if (!docId) {
+        this.logger.warn('No docId found in query parameters');
+        client.close(1008, 'Missing docId parameter');
+        return;
+      }
+
+      this.logger.debug(`Setting up WebSocket connection for docId: ${docId}`);
+      setupWSConnection(client, request, { docName: docId })
+    } catch (error) {
+      this.logger.error('Error handling WebSocket connection:', error);
+      client.close(1011, 'Internal server error');
+    }
   }
 
-  handleDisconnect(@ConnectedSocket() _client: WebSocket) {
-    console.log('Client disconnected');
+  handleDisconnect(@ConnectedSocket() client: WebSocket) {
+    this.logger.debug('Client disconnected');
+
+    client.close(1000, 'Client disconnected');
   }
 } 
